@@ -1,0 +1,97 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IP Lab | Network Diagnostics</title>
+
+<style>
+body {
+  background: #10141c;
+  color: #e8edf5;
+  font-family: Arial, sans-serif;
+  padding: 25px;
+  max-width: 650px;
+  margin: auto;
+}
+.card {
+  background: #1b2432;
+  padding: 22px;
+  border-radius: 14px;
+  margin-top: 18px;
+}
+h1 { color: #53a8ff; }
+button {
+  background: #267bd1;
+  color: white;
+  border: 0;
+  padding: 13px 20px;
+  border-radius: 8px;
+  width: 100%;
+  font-size: 16px;
+}
+.result {
+  color: #69d9a2;
+  overflow-wrap: anywhere;
+}
+small { color: #9aa9bc; }
+</style>
+</head>
+
+<body>
+
+<h1>IP LAB_</h1>
+<p>Network diagnostics tool</p>
+
+<div class="card">
+  <h3>Consulta de endereço IP</h3>
+  <p>Esta ferramenta consulta os endereços IP públicos da sua conexão.</p>
+  <label>
+    <input type="checkbox" id="consent">
+    Estou ciente de que meu IP público será consultado.
+  </label>
+  <br><br>
+  <button onclick="consultar()">Iniciar diagnóstico</button>
+</div>
+
+<div class="card">
+  <h3>Resultados</h3>
+  <p>IPv4: <span class="result" id="ipv4">---</span></p>
+  <p>IPv6: <span class="result" id="ipv6">---</span></p>
+  <small id="status">Aguardando diagnóstico...</small>
+</div>
+
+<script>
+async function consultar() {
+  if (!document.getElementById("consent").checked) {
+    alert("Confirme que está ciente da consulta.");
+    return;
+  }
+
+  const status = document.getElementById("status");
+  status.textContent = "Consultando...";
+
+  async function buscar(url) {
+    try {
+      const resposta = await fetch(url);
+      if (!resposta.ok) throw new Error();
+      return await resposta.text();
+    } catch {
+      return "Indisponível";
+    }
+  }
+
+  const [v4, v6] = await Promise.all([
+    buscar("https://api4.ipify.org"),
+    buscar("https://api6.ipify.org")
+  ]);
+
+  document.getElementById("ipv4").textContent = v4;
+  document.getElementById("ipv6").textContent = v6;
+  status.textContent = "Diagnóstico concluído.";
+}
+</script>
+
+</body>
+</html>
